@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define BLACK 1
-#define RED 0
-// rbt ±¸ÇöÀ»À§ÇÑ ÇÔ¼öµé
-int total = 0;
-int nb = 0;
-int nr = 0;
-int bh = 0;
+#define Black 1
+#define Red 0
 
-typedef struct Node* NodePtr;
+
+int bh = 0;
+int tb = 0;
+int tr = 0;
+int total = 0;
+int deleted = 0;
+int misscount = 0;
+
+typedef struct Node*NodePtr;
 struct Node {
 	int val;
 	NodePtr parent, left, right;
@@ -22,7 +25,7 @@ NodePtr node_alloc(int newval) {
 	self->parent = NULL;
 	self->left = NULL;
 	self->right = NULL;
-	self->color = BLACK;
+	self->color = Black;
 	return self;
 }
 
@@ -78,13 +81,13 @@ void Right_Rotate(RBTPtr self, NodePtr n) {
 
 void rbt_insert_fixup(RBTPtr self, NodePtr n) {
 	NodePtr y;
-	while (n->parent != NULL && n->parent->color == RED) {
+	while (n->parent != NULL && n->parent->color == Red) {
 		if (n->parent == n->parent->parent->left) {
 			y = n->parent->parent->right;
-			if (y != NULL && y->color == RED) {
-				n->parent->color = BLACK;
-				y->color = BLACK;
-				n->parent->parent->color = RED;
+			if (y != NULL && y->color == Red) {
+				n->parent->color = Black;
+				y->color = Black;
+				n->parent->parent->color = Red;
 				n = n->parent->parent;
 			}
 			else if (n == n->parent->right) {
@@ -92,17 +95,17 @@ void rbt_insert_fixup(RBTPtr self, NodePtr n) {
 				Left_Rotate(self, n);
 			}
 			else {
-				n->parent->color = BLACK;
-				n->parent->parent->color = RED;
+				n->parent->color = Black;
+				n->parent->parent->color = Red;
 				Right_Rotate(self, n->parent->parent);
 			}
 		}
 		else if (n->parent == n->parent->parent->right) {
 			y = n->parent->parent->left;
-			if (y != NULL && y->color == RED) {
-				n->parent->color = BLACK;
-				y->color = BLACK;
-				n->parent->parent->color = RED;
+			if (y != NULL && y->color == Red) {
+				n->parent->color = Black;
+				y->color = Black;
+				n->parent->parent->color = Red;
 				n = n->parent->parent;
 			}
 			else if (n == n->parent->left) {
@@ -110,13 +113,13 @@ void rbt_insert_fixup(RBTPtr self, NodePtr n) {
 				Right_Rotate(self, n);
 			}
 			else {
-				n->parent->color = BLACK;
-				n->parent->parent->color = RED;
+				n->parent->color = Black;
+				n->parent->parent->color = Red;
 				Left_Rotate(self, n->parent->parent);
 			}
 		}
 	}
-	self->root->color = BLACK;
+	self->root->color = Black;
 }
 
 
@@ -139,7 +142,7 @@ void rbt_insert(RBTPtr self, NodePtr n) {
 		y->right = n;
 	n->left = NULL;
 	n->right = NULL;
-	n->color = RED;
+	n->color = Red;
 	rbt_insert_fixup(self, n);
 }
 
@@ -148,101 +151,128 @@ void rbt_print(RBTPtr self, NodePtr tree, int level) {
 		rbt_print(self, tree->right, level + 1);
 	for (int i = 0; i < level; i++)
 		printf("    ");
-	if (tree->color == BLACK) {
+	if (tree->color == Black) {
 		printf("%dB\n", tree->val);
-		nb++;
+		tb = tb + 1;
 	}
-	if (tree->color == RED) {
+	if (tree->color == Red) {
 		printf("%dR\n", tree->val);
-		nr++;
+		tr = tr + 1;
 	}
 	if (tree->left != NULL)
 		rbt_print(self, tree->left, level + 1);
 }
 
-
-int rbt_bh(RBTPtr self, NodePtr tree, int bh) {
-	if (tree == NULL) {
-		return bh;
-	}
-	else {
-		if (tree->color == BLACK)
-			rbt_bh(self, tree->right, bh + 1);
-		else if (tree->color == RED)
-			rbt_bh(self, tree->right, bh);
-	}
-}
-void rbt_inord(NodePtr tree){
-	if (tree == NULL)
-		return;
-	rbt_inord(tree->left);
-	printf("%5d", tree->val);
-	rbt_inord(tree->right);
-}
-//ÀçÁ¤·ÄÀ» À§ÇÑ ½Ì±Û ¸µÅ©µå¸®½ºÆ® ±¸Çö ÇÔ¼ö
-struct node{
+struct node
+{
 	int data;
 	struct node *next;
 };
-void push(struct node** head_ref, int new_data){
+void push(struct node** head_ref, int new_data)
+{
 	struct node* new_node = (struct node*) malloc(sizeof(struct node));
 	new_node->data = new_data;
 	new_node->next = (*head_ref);
 	(*head_ref) = new_node;
 }
 
-void deleteNode(struct node **head_ref, int key){
-	struct node* temp = *head_ref, *prev;
-
-	if (temp != NULL && temp->data == key){
-		*head_ref = temp->next;
-		free(temp);
+void deleteNode(struct node **head_ref, int key)
+{
+	struct node* tmp = *head_ref, *prev;
+	if (tmp != NULL && tmp->data == key)
+	{
+		*head_ref = tmp->next;
+		free(tmp);
+		
 		return;
 	}
 
-	while (temp != NULL && temp->data != key){
-		prev = temp;
-		temp = temp->next;
+
+
+	while (tmp != NULL && tmp->data != key)
+	{
+		prev = tmp;
+		tmp = tmp->next;
 	}
 
-	if (temp == NULL) return;
+	if (tmp == NULL) {
+		misscount++;
+		return; }
 
-	prev->next = temp->next;
+	prev->next = tmp->next;
 
-	free(temp);
+	free(tmp);
 }
 
-int main() {
-	struct node* cur = NULL;
+void rblist(struct node *node)
+{
+	while (node != NULL)
+	{
+		printf(" %d ", node->data);
+		node = node->next;
+	}
+}
+
+int rbt_bh(RBTPtr self, NodePtr tree, int bh) {
+	if (tree == NULL) {
+		return bh;
+	}
+	else {
+		if (tree->color == Black)
+			rbt_bh(self, tree->right, bh + 1);
+		else if (tree->color == Red)
+			rbt_bh(self, tree->right, bh);
+	}
+}
+
+void inorder_traversal(NodePtr root) {
+	if (root != NULL) {
+		inorder_traversal(root->left);
+		if (root->color == 1) {
+			printf("%dB  ", root->val);
+		}
+		else if (root->color == 0) {
+			printf("%dR  ", root->val);
+		}
+		inorder_traversal(root->right);
+	}
+}
+
+int main()
+{
 	struct node* head = NULL;
-	RBTPtr rbt = rbt_alloc();
+	struct node* c = NULL;
 	FILE *fp;
 	int data;
-	fp = fopen("C:\\Users\\Á¤À±Àç\\Desktop\\ÀÚ±¸\\input.txt", "r");
+	RBTPtr rbt = rbt_alloc();
+	fp = fopen("C:\\Users\\ì •ìœ¤ìž¬\\Desktop\\ìžêµ¬\\input6.txt", "r");
 	while (!feof(fp)) {
 		fscanf(fp, "%d", &data);
 		if (data >0)
 			push(&head, data);
 		else if (data < 0) {
 			deleteNode(&head, -1 * data);
+			deleted++;
 		}
 		else if (data == 0) {
 			break;
 		}
 	}
-	cur = head;
-	while (cur != NULL)
+	c = head;
+	while (c != NULL)
 	{
-		rbt_insert(rbt, node_alloc(cur->data));
-		cur = cur->next;
+		rbt_insert(rbt, node_alloc(c->data));
+		c = c->next;
 
 	}
 	fclose(fp);
 	rbt_print(rbt, rbt->root, 0);
 	printf("\n\n\n\n");
-	printf("Total: %d\n", nb + nr);
-	printf("NB: %d\n", nb);
-	printf("BH: %d\n", rbt_bh(rbt, rbt->root, bh));
-	rbt_inord(rbt->root);
+	printf("bh is %d\n", rbt_bh(rbt, rbt->root, bh));
+	printf("total is %d\n", tb + tr);
+	printf("nb is %d\n\n\n", tb);
+	printf("deleted = %d\n\n\n", deleted - misscount);
+	printf("miss = %d\n\n\n", misscount);
+	inorder_traversal(rbt->root);
 	return 0;
 }
