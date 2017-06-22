@@ -343,7 +343,7 @@ int main()
 	RBTPtr rbt = rbt_alloc();
 	FILE *fp;
 	int num;
-	fp = fopen("C:\Users\\정윤재\\Downloads\\prjtest\\test01.txt", "r");
+	fp = fopen("C:\\Users\\정윤재\\Downloads\\prjtest\\test01.txt", "r");
 	while (!feof(fp))
 	{
 		fscanf(fp, "%d", &num);
@@ -362,11 +362,11 @@ int main()
 	}
 	fclose(fp);
 	FILE *fp2;
-	fp2 = fopen("C:\Users\\정윤재\\Downloads\\prjtest\\output.txt", "wb");
+	fp2 = fopen("C:\\Users\\정윤재\\Downloads\\prjtest\\output.txt", "wb");
 	FILE *fp1;
 	int num1;
 	NodePtr search;
-	fp1 = fopen("C:\Users\\정윤재\\Downloads\\prjtest\\search01.txt", "r");
+	fp1 = fopen("C:\\Users\\정윤재\\Downloads\\prjtest\\search01.txt", "r");
 	while (!feof(fp1))
 	{
 		fscanf(fp1, "%d", &num1);
