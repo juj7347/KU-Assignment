@@ -139,7 +139,15 @@ void rbt_insert_fixup(RBTPtr self, NodePtr n)
 	}
 	self->root->c = BLACK;
 }
-
+NodePtr rbt_search(RBTPtr self, NodePtr x, int val)
+{
+    if (x == self->NIL || x->val == val)
+        return x;
+    else if (val <= x->val)
+        return rbt_search(self,x->left, val);
+    else
+        return rbt_search(self,x->right, val);
+}
 
 void rbt_insert(RBTPtr self, NodePtr n)
 {
